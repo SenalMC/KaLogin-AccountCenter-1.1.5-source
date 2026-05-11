@@ -1,0 +1,47 @@
+# ==========================================================
+# KaLogin-AccountCenter 主界面配置
+# 说明：Paper Dialog 的 confirmation 类型只有两个底部按钮。
+# 因此账号中心采用“主界面 + 更多操作页”的结构，避免把可点击文本写进正文导致崩溃。
+# ==========================================================
+
+pages:
+  main:
+    title: '<gradient:#55C7FF:#B47CFF><bold>云墨工艺账号安全中心</bold></gradient>'
+    subtitle: '这里是你的账号安全中心。'
+    can-close-with-escape: true
+    body:
+      - '<gray>绑定邮箱后，即使忘记密码也可以通过验证码自助找回。</gray>'
+      - '<gray>当前邮箱：</gray><aqua><bold>%email%</bold></aqua>'
+      - '<dark_gray>━━━━━━━━━━━━━━━━━━━━</dark_gray>'
+      - '<gray>建议先完成邮箱绑定，再进入主大厅游玩。</gray>'
+    tip:
+      - '<gradient:#00E5FF:#B388FF>安全提示</gradient>'
+      - '<gray>管理员不会索要你的账号密码或邮箱验证码。</gray>'
+      - '<dark_gray>如果邮箱不是你本人所有，请立即更换。</dark_gray>'
+    buttons:
+      primary:
+        text: '<aqua><bold>绑定 / 更换邮箱</bold></aqua>'
+        action: 'bind'
+      secondary:
+        text: '<yellow><bold>更多操作</bold></yellow>'
+        action: 'page:more'
+
+  more:
+    title: '<gradient:#55C7FF:#B47CFF><bold>账号安全操作</bold></gradient>'
+    subtitle: '请选择你要进行的账号操作。'
+    can-close-with-escape: true
+    body:
+      - '<gray>当前邮箱：</gray><aqua><bold>%email%</bold></aqua>'
+      - '<gray>你可以在这里修改密码，或返回玩家协议界面。</gray>'
+      - '<dark_gray>━━━━━━━━━━━━━━━━━━━━</dark_gray>'
+      - '<gray>修改密码会向当前绑定邮箱发送验证码。</gray>'
+    tip:
+      - '<gradient:#00E5FF:#B388FF>安全提示</gradient>'
+      - '<gray>请确认邮箱仍可正常接收验证码。</gray>'
+    buttons:
+      primary:
+        text: '<green><bold>修改密码</bold></green>'
+        action: 'change'
+      secondary:
+        text: '<aqua><bold>返回协议界面</bold></aqua>'
+        action: 'close'

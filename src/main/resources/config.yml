@@ -1,0 +1,149 @@
+# ==========================================================
+# KaLogin-AccountCenter
+# KaLogin 账号安全中心附属插件
+# 适用：Paper 1.21.8+ / KaLogin Dialog 登录服
+# ==========================================================
+
+# 调试模式：开启后会在控制台输出账号查询、邮箱比对、命令绕过等信息。
+debug: false
+
+
+# Dialog 连续性修复：KaLogin 自身可能会在登录界面重新打开 Dialog，导致 KAC 弹窗被顶掉。
+# 这里通过延迟和少量重试来保证 /kac recover 打开的界面能覆盖 KaLogin 登录框。
+dialog:
+  command-open-delay-ticks: 4
+  open-delay-ticks: 2
+  reopen-attempts: 2
+  reopen-interval-ticks: 6
+
+
+# 账号中心后续动作：用于登录服协议流程衔接。
+# command-mode: console 表示控制台执行；player 表示玩家执行。
+# 支持占位符：%player% / %player_name% / %uuid% / %ip%
+after-actions:
+  # 玩家在账号中心点击“完成并返回”时执行。
+  # 典型用法：重新打开玩家协议菜单。
+  center-close:
+    enabled: false
+    command-mode: console
+    commands:
+      - 'km open player_agreement %player%'
+
+  # 邮箱绑定成功后执行。
+  bind-success:
+    enabled: false
+    close-dialog: false
+    command-mode: console
+    commands:
+      - 'km open player_agreement %player%'
+
+  # 密码修改 / 找回重置成功后执行。
+  password-reset-success:
+    enabled: false
+    close-dialog: false
+    command-mode: console
+    commands:
+      - 'km open player_agreement %player%'
+
+command-bypass:
+  # 开启后，未登录玩家点击 KaLogin UI 里的 /kac recover 也能被本插件直接接管。
+  # 这不会放行其他命令，只会接管 allowed-while-not-logged 内的子命令。
+  enabled: true
+  aliases:
+    - kac
+    - accountcenter
+    - kaloginaccountcenter
+  allowed-while-not-logged:
+    - recover
+    - forgot
+    - reset
+    - verify
+    - help
+
+storage:
+  # catseed = 兼容 CatSeedLogin accounts.db
+  # kalogin = 兼容 KaLogin 原生 kalogin_users 数据库
+  # 注意：kalogin 模式下，邮箱绑定数据不会写入 KaLogin 用户表，而是保存到本插件本地数据库。
+  mode: catseed
+
+catseed:
+  sqlite-file: 'D:/服务器/[25566] 登录服/plugins/CatSeedLogin/accounts.db'
+  table: accounts
+  columns:
+    username: name
+    password: password
+    email: email
+    ips: ips
+    last-action: lastAction
+  username-ignore-case: true
+
+kalogin:
+  sqlite-file: 'plugins/KaLogin/data.db'
+  # KaLogin 原生模式下，本插件自己的邮箱绑定数据库。
+  # 用于避免破坏 KaLogin 原生数据库结构；KAC 只在重置密码时修改 KaLogin 的 password 字段。
+  local-email-db: 'plugins/KaLogin-AccountCenter/accountcenter.db'
+  user-table: kalogin_users
+  accountcenter-table: kac_emails
+  columns:
+    uuid: uuid
+    username: username
+    password: password
+
+password:
+  min-length: 6
+  max-length: 20
+
+verification:
+  code-length: 6
+  expire-minutes: 10
+  cooldown-seconds: 60
+  max-attempts: 5
+
+mail:
+  enabled: true
+  # 开启后会输出 JavaMail 详细 SMTP 日志，方便定位认证失败/端口不通/SSL问题。
+  debug: false
+  connection-timeout-ms: 10000
+  timeout-ms: 10000
+  write-timeout-ms: 10000
+  smtp-host: 'smtp.qq.com'
+  smtp-port: 465
+  ssl: true
+  starttls: false
+  username: 'your@qq.com'
+  password: 'your_smtp_auth_code'
+  from-address: 'your@qq.com'
+  from-name: '云墨工艺账号中心'
+  subject-bind: '云墨工艺邮箱绑定验证码'
+  subject-reset: '云墨工艺找回密码验证码'
+
+messages:
+  prefix: '<gradient:#55C7FF:#B47CFF><bold>账号中心</bold></gradient> <dark_gray>»</dark_gray> '
+  no-permission: '<red>你没有权限执行这个指令。'
+  reload: '<green>配置已重载。'
+  mail-disabled: '<red>邮件系统未启用，请联系管理员。'
+  mail-sent: '<green>验证码已发送，请检查邮箱。'
+  cooldown: '<red>请求过于频繁，请稍后再试。'
+  invalid-email: '<red>邮箱格式不正确。'
+  user-not-found: '<red>账号不存在。'
+  email-not-match: '<red>该邮箱不是此账号绑定的邮箱。'
+  code-wrong: '<red>验证码错误或已过期。'
+  bind-success: '<green>邮箱绑定成功。'
+  reset-success: '<green>密码已重置，请使用新密码登录。'
+  password-invalid: '<red>密码长度必须为 6 - 20 位。'
+  password-not-same: '<red>两次输入的密码不一致。'
+  email-empty: '<red>当前账号尚未绑定邮箱，请先绑定邮箱。'
+  center-closed: '<green>账号中心已关闭。'
+
+ui:
+  title-main: '<gradient:#55C7FF:#B47CFF><bold>云墨工艺账号中心</bold></gradient>'
+  title-bind: '<gradient:#55C7FF:#B47CFF><bold>绑定邮箱</bold></gradient>'
+  title-verify: '<gradient:#55C7FF:#B47CFF><bold>验证邮箱</bold></gradient>'
+  title-recover: '<gradient:#55C7FF:#B47CFF><bold>找回密码</bold></gradient>'
+  title-reset: '<gradient:#55C7FF:#B47CFF><bold>重置密码</bold></gradient>'
+  title-change: '<gradient:#55C7FF:#B47CFF><bold>修改密码</bold></gradient>'
+  button-next: '<green><bold>继续</bold></green>'
+  button-send: '<aqua><bold>发送验证码</bold></aqua>'
+  button-confirm: '<green><bold>确认</bold></green>'
+  button-cancel: '<red>取消</red>'
+  button-back: '<yellow><bold>返回</bold></yellow>'

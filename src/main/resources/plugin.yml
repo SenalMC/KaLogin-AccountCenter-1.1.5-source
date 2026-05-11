@@ -1,0 +1,17 @@
+name: KaLogin-AccountCenter
+version: ${version}
+main: top.cnuo.kalogin.accountcenter.KaLoginAccountCenterPlugin
+api-version: '1.21'
+author: SenalMC / Cnuo
+loadbefore:
+  - KaLogin
+commands:
+  kac:
+    description: KaLogin Account Center command
+    usage: /kac <center|bind|change|recover|reset|reload>
+    permission: kac.use
+permissions:
+  kac.use:
+    default: true
+  kac.admin:
+    default: op
